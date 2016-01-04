@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Testing</title>
+  <link rel="stylesheet" href="bootstrap.css">
+</head>
+<body>
+  <div id="react-app"></div>
+  <script src="https://fb.me/react-0.14.3.js"></script>
+  <script src="https://fb.me/react-dom-0.14.3.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+  <script type="text/babel">
+  /*
+ * Components
+ */
+ var pendingItems = [
+ 'Clean the room',
+ 'Get milf',
+ 'Sellout and stuff'
+ ];
+
+ var finishedItems = [
+ 'Clean the room',
+ ];
+
+ var Inputs = React.createClass({
+  getInitialState: function() {
+    return { 
+      items: this.props.list
+    };
+  },
+  propTypes: {
+    email:      React.PropTypes.string,
+    seats:      React.PropTypes.number,
+  }
+  getDefaultProps: function () {
+    return { name: "Hello" };
+  },
+  handleClick: function(i) {
+
+  },
+  render: function() {
+    return (
+      <ul>
+        {this.state.items.map(function(item, i) {
+          return (
+            <li onClick={this.handleClick.bind(this, i)} key={i}>{this.state.items[i]}</li>
+            );
+        }, this)}
+      </ul>
+      );
+  },
+});
+
+ReactDOM.render(<Layout />, document.getElementById('react-app'));
+</script>
+
+</body>
+</html>
+<!-- 
+  render: function() {
+    return (
+      <ul>
+        {this.state.items.map(function(item, i) {
+          return (
+            <li onClick={this.handleClick.bind(this, i)} key={i}>{this.state.items[i]}</li>
+            );
+        }, this)}
+      </ul>
+      );
+  }, -->
