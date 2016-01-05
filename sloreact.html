@@ -17,9 +17,7 @@
 <body>
   <!-- HTML -->
   <div class="container">
-    <div class="focus col-xs-12">
-      <span class="focus-title"></span>
-      <span class="focus-text"></span>
+    <div id="focus" class="focus col-xs-12">
     </div>
     <div class=" form-container col-xs-12">
      <div class="form col-xs-12 col-sm-7 col-md-6">
@@ -55,18 +53,22 @@
   propTypes: {
     type:      React.PropTypes.string,
     xmltag:      React.PropTypes.string,
+    text:      React.PropTypes.string,
     class:      React.PropTypes.string
+  },
+    onFocus: function(){
+    this.props.onFocus(this.props.text);
   },
   getDefaultProps: function () {
     return { 
-      type: ' text'
+      type: ' text',
     };
   },
   render: function() {
     return (
       <div className={'form-element col-xs-6 col-sm-6 ' + this.props.class}>
         <label className="col-xs-12">{this.props.text}</label>
-        <input className="col-xs-12" type={this.props.type} xmltag={this.props.xmltag}></input>
+        <input className="col-xs-12" type={this.props.type} onFocus={this.onFocus} xmltag={this.props.xmltag}></input>
       </div>
       );
   },
@@ -84,25 +86,39 @@
       </div>
       );
   },
+}); 
+
+ var Focus = React.createClass({
+  handleClearClick: function() {
+    location.reload();
+  },
+  render: function() {
+    return (
+      <div className="btn-container col-xs-12">
+         <span className="focus-title"></span>
+         <span className="focus-text"></span>
+      </div>
+      );
+  },
 });
 
  var formTags = {
-  caseNumber: ["CASENUMBER", "HPE Case Number", "type='text'"],
-  caseTitle: ["CASETITLE", "Case Title", "type='text'"],
+  caseNumber: ["CASENUMBER", "HPE Case Number", "text"],
+  caseTitle: ["CASETITLE", "Case Title", "text"],
   said: ["SAID", "SAID", "type='text'"],
-  serialNumber: ["SERIALNUMBER", "Serial Number", "type='text'"],
-  productNumber: ["PRODUCTNUMBER", "Product Number", "type='text'"],
-  productDesc: ["PRODUCTDESC", "Producet Description", "type='text'"],
+  serialNumber: ["SERIALNUMBER", "Serial Number", "text"],
+  productNumber: ["PRODUCTNUMBER", "Product Number", "text"],
+  productDesc: ["PRODUCTDESC", "Product Description", "text"],
   customer: ["CUSTOMER", "Customer", "type='text'"],
-  contactName: ["CONTACTNAME", "Contact Name", "type='text'"],
-  contactEmail: ["CONTACTEMAIL", "Contact Email", "type='text'"],
-  contactPhone: ["CONTACTPHONE", "Contact Phone", "type='text'"],
-  description: ["DESCRIPTION", "Problem Description", "type='text'"]
+  contactName: ["CONTACTNAME", "Contact Name", "text"],
+  contactEmail: ["CONTACTEMAIL", "Contact Email", "text"],
+  contactPhone: ["CONTACTPHONE", "Contact Phone", "text"],
+  description: ["DESCRIPTION", "Problem Description", "text"]
 };
 
 var formPart = {
   partNumber: ["PARTNUMBER", "Spare Part Number", "type='text'"],
-  quantity: ["QUANTITY", "Quantity", "type='number' min='0'"]
+  quantity: ["QUANTITY", "Quantity", "number"]
 }
 
 
@@ -122,6 +138,9 @@ var InputList = React.createClass({
     };
       
 
+  },
+  onFocus: function(text){
+    console.log(text);
   },
   componentDidMount: function() {
     $("input[type=text]").focusin(function () {
@@ -144,7 +163,7 @@ var InputList = React.createClass({
 
     for (var key in formTags) {
       inputs.push(
-        <Inputs key={key} type="text" class={key} xmltag={formTags[key][0]} text={formTags[key][1]} value={formTags[key]} />
+        <Inputs key={key} type="text" class={key} xmltag={formTags[key][0]} onFocus={this.onFocus} text={formTags[key][1]} value={formTags[key]} />
         );
     };
 
@@ -164,6 +183,7 @@ var InputList = React.createClass({
 });
 
 ReactDOM.render(<InputList type="number" text="Case ID"/>, document.getElementById('reactForm'));
+ReactDOM.render(<Focus />, document.getElementById('focus'));
 </script>
 </body>
 <script src="js/main.js"></script>
