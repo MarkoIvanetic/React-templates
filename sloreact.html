@@ -1,72 +1,170 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
   <meta charset="utf-8">
-  <title>Testing</title>
-  <link rel="stylesheet" href="bootstrap.css">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Slovenia</title>
+  <meta name="description" content="Slovenian partner templates">
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <script src="js/ZeroClipboard.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="react-app"></div>
-  <script src="https://fb.me/react-0.14.3.js"></script>
-  <script src="https://fb.me/react-dom-0.14.3.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
-  <script type="text/babel">
+  <!-- HTML -->
+  <div class="container">
+    <div class="focus col-xs-12">
+      <span class="focus-title"></span>
+      <span class="focus-text"></span>
+    </div>
+    <div class=" form-container col-xs-12">
+     <div class="form col-xs-12 col-sm-7 col-md-6">
+      <form id="mainForm" class="col-xs-12">
+        <fieldset id="reactForm">
+          <!-- Form Name -->
+          <legend>Slovenian templates</legend>
+        </fieldset>
+      </form>
+
+    </div>
+    <div id="output" class="output col-xs-12 col-sm-5 col-md-6">
+      <textarea class="col-xs-12"></textarea>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://fb.me/react-0.14.3.js"></script>
+<script src="https://fb.me/react-dom-0.14.3.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+<script type="text/babel">
   /*
  * Components
  */
- var pendingItems = [
- 'Clean the room',
- 'Get milf',
- 'Sellout and stuff'
- ];
-
- var finishedItems = [
- 'Clean the room',
- ];
 
  var Inputs = React.createClass({
   getInitialState: function() {
     return { 
-      items: this.props.list
+      items: this.props.list,
     };
   },
   propTypes: {
-    email:      React.PropTypes.string,
-    seats:      React.PropTypes.number,
-  }
-  getDefaultProps: function () {
-    return { name: "Hello" };
+    type:      React.PropTypes.string,
+    xmltag:      React.PropTypes.string,
+    class:      React.PropTypes.string
   },
-  handleClick: function(i) {
-
+  getDefaultProps: function () {
+    return { 
+      type: ' text'
+    };
   },
   render: function() {
     return (
-      <ul>
-        {this.state.items.map(function(item, i) {
-          return (
-            <li onClick={this.handleClick.bind(this, i)} key={i}>{this.state.items[i]}</li>
-            );
-        }, this)}
-      </ul>
+      <div className={'form-element col-xs-6 col-sm-6 ' + this.props.class}>
+        <label className="col-xs-12">{this.props.text}</label>
+        <input className="col-xs-12" type={this.props.type} xmltag={this.props.xmltag}></input>
+      </div>
+      );
+  },
+});
+ var Buttons = React.createClass({
+  handleClearClick: function() {
+    location.reload();
+  },
+  render: function() {
+    return (
+      <div className="btn-container col-xs-12">
+        <input id="submit" className="btn submit col-xs-3" type="button" value="Submit" onClick={this.props.onClick}></input>
+        <input id="clear" className="btn clear col-xs-3" type="button" value="Clear" onClick={this.handleClearClick}></input>
+        <input id="copy" className="btn copy col-xs-3" data-clipboard-target='output' type="button" value="Copy"></input>
+      </div>
       );
   },
 });
 
-ReactDOM.render(<Layout />, document.getElementById('react-app'));
-</script>
+ var formTags = {
+  caseNumber: ["CASENUMBER", "HPE Case Number", "type='text'"],
+  caseTitle: ["CASETITLE", "Case Title", "type='text'"],
+  said: ["SAID", "SAID", "type='text'"],
+  serialNumber: ["SERIALNUMBER", "Serial Number", "type='text'"],
+  productNumber: ["PRODUCTNUMBER", "Product Number", "type='text'"],
+  productDesc: ["PRODUCTDESC", "Producet Description", "type='text'"],
+  customer: ["CUSTOMER", "Customer", "type='text'"],
+  contactName: ["CONTACTNAME", "Contact Name", "type='text'"],
+  contactEmail: ["CONTACTEMAIL", "Contact Email", "type='text'"],
+  contactPhone: ["CONTACTPHONE", "Contact Phone", "type='text'"],
+  description: ["DESCRIPTION", "Problem Description", "type='text'"]
+};
 
-</body>
-</html>
-<!-- 
+var formPart = {
+  partNumber: ["PARTNUMBER", "Spare Part Number", "type='text'"],
+  quantity: ["QUANTITY", "Quantity", "type='number' min='0'"]
+}
+
+
+var InputList = React.createClass({
+  onSubmitClick: function(){
+    function renderOutput(object, wrapperStart, wrapperEnd) {
+      var tempOutput;
+      var mainOutput = wrapperStart;
+      for (var key in object) {
+        tempOutput = "\n<" + object[key][0] + ">" + $("." + key + " input").val() + "</" + object[key][0] + ">";
+        mainOutput += tempOutput;
+      }
+      mainOutput += "\n" + wrapperEnd;
+      console.log(renderOutput.length);
+      return mainOutput;
+      console.log("Args lenght: "+arguments.length);
+    };
+      
+
+  },
+  componentDidMount: function() {
+    $("input[type=text]").focusin(function () {
+      $(".focus-title").text($("input:focus").siblings("label").text()+':');
+
+      $(".focus-text").text($(this).val());
+      $(this).on("input", function() {
+       $(".focus-text").text($(this).val());
+     })
+    });
+
+    $("input[type=text]").focusout(function () {
+      $(".focus-title").text('');
+      $(".focus-text").text('');
+    });
+  },
   render: function() {
-    return (
-      <ul>
-        {this.state.items.map(function(item, i) {
-          return (
-            <li onClick={this.handleClick.bind(this, i)} key={i}>{this.state.items[i]}</li>
-            );
-        }, this)}
-      </ul>
-      );
-  }, -->
+    var inputs = [];
+    var parts = [];
+
+    for (var key in formTags) {
+      inputs.push(
+        <Inputs key={key} type="text" class={key} xmltag={formTags[key][0]} text={formTags[key][1]} value={formTags[key]} />
+        );
+    };
+
+    for (var key in formPart) {
+      parts.push(
+        <Inputs key={key} type="text" class={key} xmltag={formPart[key][0]} text={formPart[key][1]} value={formPart[key]} />
+        );
+    };
+
+    return <div>
+    {inputs}
+    {parts}
+    <Buttons onClick={this.onSubmitClick}/>
+  </div>;
+}
+
+});
+
+ReactDOM.render(<InputList type="number" text="Case ID"/>, document.getElementById('reactForm'));
+</script>
+</body>
+<script src="js/main.js"></script>
+</html>
