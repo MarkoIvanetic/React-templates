@@ -16,174 +16,200 @@
 </head>
 <body>
   <!-- HTML -->
-  <div class="container">
-    <div id="focus" class="focus col-xs-12">
-    </div>
-    <div class=" form-container col-xs-12">
-     <div class="form col-xs-12 col-sm-7 col-md-6">
-      <form id="mainForm" class="col-xs-12">
-        <fieldset id="reactForm">
-          <!-- Form Name -->
-          <legend>Slovenian templates</legend>
-        </fieldset>
-      </form>
-
-    </div>
-    <div id="output" class="output col-xs-12 col-sm-5 col-md-6">
-      <textarea class="col-xs-12"></textarea>
-    </div>
-  </div>
-</div>
+  <div id="container" class="container"></div>
 
 
-<script src="https://fb.me/react-0.14.3.js"></script>
-<script src="https://fb.me/react-dom-0.14.3.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
-<script type="text/babel">
-  /*
- * Components
- */
+  <script src="https://fb.me/react-0.14.3.js"></script>
+  <script src="https://fb.me/react-dom-0.14.3.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+  <script type="text/babel">
 
- var Inputs = React.createClass({
-  getInitialState: function() {
-    return { 
-      items: this.props.list,
+    /*******************************************Objects*******************************************/
+    var formTags = {
+      caseNumber: ["CASENUMBER", "HPE Case Number", "text"],
+      caseTitle: ["CASETITLE", "Case Title", "text"],
+      said: ["SAID", "SAID", "type='text'"],
+      serialNumber: ["SERIALNUMBER", "Serial Number", "text"],
+      productNumber: ["PRODUCTNUMBER", "Product Number", "text"],
+      productDesc: ["PRODUCTDESC", "Product Description", "text"],
+      customer: ["CUSTOMER", "Customer", "type='text'"],
+      contactName: ["CONTACTNAME", "Contact Name", "text"],
+      contactEmail: ["CONTACTEMAIL", "Contact Email", "text"],
+      contactPhone: ["CONTACTPHONE", "Contact Phone", "text"],
+      description: ["DESCRIPTION", "Problem Description", "text"]
     };
-  },
+
+    var formPart = {
+      partNumber: ["PARTNUMBER", "Spare Part Number", "type='text'"],
+      quantity: ["QUANTITY", "Quantity", "number"]
+    }
+    /**************************************Input Conponent**************************************/
+    var Inputs = React.createClass({
+      getInitialState: function() {
+        return { 
+          items: this.props.list,
+        };
+      },
+      propTypes: {
+        type:      React.PropTypes.string,
+        xmltag:      React.PropTypes.string,
+        text:      React.PropTypes.string,
+        class:      React.PropTypes.string
+      },
+      onFocus: function(){
+        this.props.onFocus(this.props.text);
+      },
+      getDefaultProps: function () {
+        return { 
+          type: ' text',
+        };
+      },
+      render: function() {
+        return (
+          <div className={'form-element col-xs-6 col-sm-6 ' + this.props.class}>
+            <label className="col-xs-12">{this.props.text}</label>
+            <input className="col-xs-12" type={this.props.type} onFocus={this.onFocus} xmltag={this.props.xmltag}></input>
+          </div>
+          );
+      },
+    });
+    /**************************************Buttons Component***************************************/
+    var Buttons = React.createClass({
+      handleClearClick: function() {
+        location.reload();
+      },
+      render: function() {
+        return (
+          <div className="btn-container col-xs-12">
+            <input id="submit" className="btn submit col-xs-3" type="button" value="Submit" onClick={this.props.onClick}></input>
+            <input id="clear" className="btn clear col-xs-3" type="button" value="Clear" onClick={this.handleClearClick}></input>
+            <input id="copy" className="btn copy col-xs-3" data-clipboard-target='output' type="button" value="Copy"></input>
+          </div>
+          );
+      },
+    }); 
+    /**************************************Focus Component***************************************/
+    var Focus = React.createClass({
+      handleClearClick: function() {
+        location.reload();
+      },
+      render: function() {
+        return (        
+          <div id="focus" className="focus col-xs-12">
+            <span className="focus-title"></span>
+            <span className="focus-text"></span>
+          </div>
+          );
+      },
+    }); 
+    /**************************************Output Component***************************************/
+    var Output = React.createClass({
+      render: function() {
+        return (        
+          <div id="output" className="output col-xs-12 col-sm-5 col-md-6">
+            <textarea className="col-xs-12"></textarea>
+          </div>
+          );
+      },
+    });
+    /**************************************InputList Component***************************************/
+    var InputList = React.createClass({
+      onSubmitClick: function(){
+        function renderOutput(object, wrapperStart, wrapperEnd) {
+          var tempOutput;
+          var mainOutput = wrapperStart;
+          for (var key in object) {
+            tempOutput = "\n<" + object[key][0] + ">" + $("." + key + " input").val() + "</" + object[key][0] + ">";
+            mainOutput += tempOutput;
+          }
+          mainOutput += "\n" + wrapperEnd;
+          console.log(renderOutput.length);
+          return mainOutput;
+          console.log("Args lenght: "+arguments.length);
+        };
+      },
+      onFocus: function(text){
+        console.log(text);
+      },
+      componentDidMount: function() {
+        $("input[type=text]").focusin(function () {
+          $(".focus-title").text($("input:focus").siblings("label").text()+':');
+
+          $(".focus-text").text($(this).val());
+          $(this).on("input", function() {
+           $(".focus-text").text($(this).val());
+         })
+        });
+
+        $("input[type=text]").focusout(function () {
+          $(".focus-title").text('');
+          $(".focus-text").text('');
+        });
+      },
+      render: function() {
+        var inputs = [];
+        var parts = [];
+
+        for (var key in formTags) {
+          inputs.push(
+            <Inputs key={key} type="text" class={key} xmltag={formTags[key][0]} onFocus={this.onFocus} text={formTags[key][1]} value={formTags[key]} />
+            );
+        };
+
+        for (var key in formPart) {
+          parts.push(
+            <Inputs key={key} type="text" class={key} xmltag={formPart[key][0]} text={formPart[key][1]} value={formPart[key]} />
+            );
+        };
+        return (
+          <div>
+            {inputs}
+            {parts}
+            <Buttons onClick={this.onSubmitClick}/>
+          </div>)
+      }
+
+    });
+/**************************************MAIN Component***************************************/
+var App = React.createClass({
   propTypes: {
-    type:      React.PropTypes.string,
-    xmltag:      React.PropTypes.string,
-    text:      React.PropTypes.string,
-    class:      React.PropTypes.string
+    focusText:      React.PropTypes.string,
+
   },
-    onFocus: function(){
+  getInitialState: function() {
+        return { 
+          focusText: '',
+        };
+      },  
+  onFocus: function(){
     this.props.onFocus(this.props.text);
   },
   getDefaultProps: function () {
     return { 
-      type: ' text',
+
     };
-  },
+  },  
   render: function() {
     return (
-      <div className={'form-element col-xs-6 col-sm-6 ' + this.props.class}>
-        <label className="col-xs-12">{this.props.text}</label>
-        <input className="col-xs-12" type={this.props.type} onFocus={this.onFocus} xmltag={this.props.xmltag}></input>
-      </div>
-      );
+      <div className="col-xs-12">
+       <Focus />
+       <div className=" form-container col-xs-12">
+        <div className="form col-xs-12 col-sm-7 col-md-6">
+         <form id="mainForm" className="col-xs-12">
+          <fieldset id="reactForm">
+           <legend>Slovenian templates</legend>
+         </fieldset>
+         <InputList />
+       </form>
+     </div>
+     <Output />
+   </div>
+ </div>
+ );
   },
 });
- var Buttons = React.createClass({
-  handleClearClick: function() {
-    location.reload();
-  },
-  render: function() {
-    return (
-      <div className="btn-container col-xs-12">
-        <input id="submit" className="btn submit col-xs-3" type="button" value="Submit" onClick={this.props.onClick}></input>
-        <input id="clear" className="btn clear col-xs-3" type="button" value="Clear" onClick={this.handleClearClick}></input>
-        <input id="copy" className="btn copy col-xs-3" data-clipboard-target='output' type="button" value="Copy"></input>
-      </div>
-      );
-  },
-}); 
-
- var Focus = React.createClass({
-  handleClearClick: function() {
-    location.reload();
-  },
-  render: function() {
-    return (
-      <div className="btn-container col-xs-12">
-         <span className="focus-title"></span>
-         <span className="focus-text"></span>
-      </div>
-      );
-  },
-});
-
- var formTags = {
-  caseNumber: ["CASENUMBER", "HPE Case Number", "text"],
-  caseTitle: ["CASETITLE", "Case Title", "text"],
-  said: ["SAID", "SAID", "type='text'"],
-  serialNumber: ["SERIALNUMBER", "Serial Number", "text"],
-  productNumber: ["PRODUCTNUMBER", "Product Number", "text"],
-  productDesc: ["PRODUCTDESC", "Product Description", "text"],
-  customer: ["CUSTOMER", "Customer", "type='text'"],
-  contactName: ["CONTACTNAME", "Contact Name", "text"],
-  contactEmail: ["CONTACTEMAIL", "Contact Email", "text"],
-  contactPhone: ["CONTACTPHONE", "Contact Phone", "text"],
-  description: ["DESCRIPTION", "Problem Description", "text"]
-};
-
-var formPart = {
-  partNumber: ["PARTNUMBER", "Spare Part Number", "type='text'"],
-  quantity: ["QUANTITY", "Quantity", "number"]
-}
-
-
-var InputList = React.createClass({
-  onSubmitClick: function(){
-    function renderOutput(object, wrapperStart, wrapperEnd) {
-      var tempOutput;
-      var mainOutput = wrapperStart;
-      for (var key in object) {
-        tempOutput = "\n<" + object[key][0] + ">" + $("." + key + " input").val() + "</" + object[key][0] + ">";
-        mainOutput += tempOutput;
-      }
-      mainOutput += "\n" + wrapperEnd;
-      console.log(renderOutput.length);
-      return mainOutput;
-      console.log("Args lenght: "+arguments.length);
-    };
-      
-
-  },
-  onFocus: function(text){
-    console.log(text);
-  },
-  componentDidMount: function() {
-    $("input[type=text]").focusin(function () {
-      $(".focus-title").text($("input:focus").siblings("label").text()+':');
-
-      $(".focus-text").text($(this).val());
-      $(this).on("input", function() {
-       $(".focus-text").text($(this).val());
-     })
-    });
-
-    $("input[type=text]").focusout(function () {
-      $(".focus-title").text('');
-      $(".focus-text").text('');
-    });
-  },
-  render: function() {
-    var inputs = [];
-    var parts = [];
-
-    for (var key in formTags) {
-      inputs.push(
-        <Inputs key={key} type="text" class={key} xmltag={formTags[key][0]} onFocus={this.onFocus} text={formTags[key][1]} value={formTags[key]} />
-        );
-    };
-
-    for (var key in formPart) {
-      parts.push(
-        <Inputs key={key} type="text" class={key} xmltag={formPart[key][0]} text={formPart[key][1]} value={formPart[key]} />
-        );
-    };
-
-    return <div>
-    {inputs}
-    {parts}
-    <Buttons onClick={this.onSubmitClick}/>
-  </div>;
-}
-
-});
-
-ReactDOM.render(<InputList type="number" text="Case ID"/>, document.getElementById('reactForm'));
-ReactDOM.render(<Focus />, document.getElementById('focus'));
+/**************************************Render and End***************************************/
+ReactDOM.render(<App />, document.getElementById('container'));
 </script>
 </body>
 <script src="js/main.js"></script>
